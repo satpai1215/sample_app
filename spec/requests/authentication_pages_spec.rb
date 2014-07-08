@@ -60,6 +60,13 @@ describe "Authentication" do
    		describe "for non-signed-in users" do
    			let(:user) {FactoryGirl.create(:user)}
 
+        describe "should not have 'Profile' and 'Settings' links" do
+          before {visit root_path}
+
+          it {should_not have_link('Users',   href: users_path)}
+          it {should_not have_link('Profile',   href: user_path(user))}
+        end
+
 
    			describe "when attempting to visit a protected page" do
    				before do
@@ -111,6 +118,18 @@ describe "Authentication" do
    				specify {expect(response).to redirect_to(root_url)}
    			end
    		end
+
+      describe 'destroy' do
+        describe "as admin" do
+          let(:admin_user) {FactoryGirl.create(:admin)}
+          before do
+            sign_in admin_user, no_capybara: true
+          end
+
+          specify {expect {delete user_path(admin_user.id)}.not_to change(User, :count).by(-1) }
+          
+        end
+      end
 
    	end
 

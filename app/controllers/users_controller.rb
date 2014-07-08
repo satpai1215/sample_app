@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   before_action :signed_in_user,  only: [:index, :edit, :update, :destroy]
   before_action :correct_user,    only: [:edit, :update]
   before_action :admin_user,      only: [:destroy]
+  before_action :redirect_home,    only: [:new, :create]
 
 
   def index
@@ -40,9 +41,14 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User deleted"
-    redirect_to users_url
+    user = User.find(params[:id])
+    if current_user?(user)
+      redirect_to users_url, notice: "You cannot delete yourself"
+    else
+      user.destroy
+      flash[:success] = "User deleted"
+      redirect_to users_url
+    end
   end
 
 
@@ -70,6 +76,12 @@ class UsersController < ApplicationController
       redirect_to(root_url) unless current_user.admin?
     end
 
+    def redirect_home
+      if signed_in?
+        flash[:notice] = "You are already signed in"
+        redirect_to(root_url)
+      end
+    end
 
 
 end
