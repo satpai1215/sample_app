@@ -3,5 +3,18 @@
 	<div class='field'>
 		<%= f.text_area :content, placeholder: "Compose new micropost..." %>
 	</div>
+	<span id="micropost_char_count">140 characters left</span>
 	<%= f.submit "Post", class: "btn btn-large btn-primary" %>
+<% end %>
+
+<%= javascript_tag do %>
+	$(function() {
+		updateCharCount();
+		$('#micropost_content').on('input', updateCharCount);
+	});
+
+	function updateCharCount() {
+		var length = 140 - $('#micropost_content').val().length;
+      	$('#micropost_char_count').text(length + " characters left");
+	}
 <% end %>
